@@ -8,13 +8,13 @@ class Agente:
         self.state_history = []
 
     def setV(self, V):
-        self.V = V
+        self.V = V  # Imposta la funzione valore
 
     def set_symbol(self, symbol):
-        self.symbol = symbol
+        self.symbol = symbol  # Imposta il simbolo del giocatore
 
     def reset_history(self):
-        self.state_history = []
+        self.state_history = []  # Reset della cronologia degli stati
 
     def take_action(self, env):
         if np.random.rand() < self.eps:
@@ -24,10 +24,10 @@ class Agente:
             next_move = empty_moves[index]
         else:
             next_move, _ = env.get_next_best_move(self)
-        env.board[next_move[0], next_move[1]] = self.symbol
+        env.board[next_move[0], next_move[1]] = self.symbol  # Esegui la mossa
 
     def update_state_history(self, s):
-        self.state_history.append(s)
+        self.state_history.append(s)  # Aggiorna la cronologia degli stati
 
     def update(self, env):
         reward = env.reward(self.symbol)
@@ -36,7 +36,7 @@ class Agente:
             value = self.V[prev] + self.alpha * (target - self.V[prev])
             self.V[prev] = value
             target = value
-        self.reset_history()
+        self.reset_history()  # Reset della cronologia dopo l'aggiornamento
 
 class Ambiente:
     def __init__(self):
@@ -48,13 +48,13 @@ class Ambiente:
         self.max_states = 3 ** (3 * 3)
 
     def is_empty(self, i, j):
-        return self.board[i, j] == 0
+        return self.board[i, j] == 0  # Verifica se la casella è vuota
 
     def reward(self, symbol):
         if self.game_over() and self.winner == symbol:
             return 1
         else:
-            return 0
+            return 0  # Ritorna la ricompensa
 
     def game_over(self):
         if self.ended:
@@ -87,7 +87,7 @@ class Ambiente:
             return True
 
         self.winner = None
-        return False
+        return False  # Determina se il gioco è finito
 
     def get_state(self):
         state = 0
@@ -102,7 +102,7 @@ class Ambiente:
                     state_value = 0
                 state += (3 ** loop_index) * state_value
                 loop_index += 1
-        return state
+        return state  # Ritorna lo stato attuale del gioco
 
     def get_empty_moves(self):
         empty_moves = []
@@ -110,7 +110,7 @@ class Ambiente:
             for j in range(3):
                 if self.is_empty(i, j):
                     empty_moves.append((i, j))
-        return empty_moves
+        return empty_moves  # Ritorna le mosse possibili
 
     def get_next_best_move(self, agent):
         best_value = -1
@@ -126,7 +126,7 @@ class Ambiente:
                         best_value = agent.V[state]
                         best_state = state
                         next_best_move = (i, j)
-        return next_best_move, best_state
+        return next_best_move, best_state  # Ritorna la prossima mossa migliore
 
     def draw_board(self):
         for i in range(3):
@@ -141,15 +141,15 @@ class Ambiente:
                     print("|  ", end=" ")
             print("|")
         print(" -------------")
-        print("\n")
+        print("\n")  # Disegna il tabellone
 
     def save_state(self, filename):
         with open(filename, 'wb') as f:
-            pickle.dump(self.board, f)
+            pickle.dump(self.board, f)  # Salva lo stato del gioco
 
     def load_state(self, filename):
         with open(filename, 'rb') as f:
-            self.board = pickle.load(f)
+            self.board = pickle.load(f)  # Carica lo stato del gioco
 
 class Utente:
     def __init__(self):
@@ -158,14 +158,12 @@ class Utente:
         self.o = 1  # player 2
 
     def set_symbol(self, symbol):
-        self.symbol = symbol
+        self.symbol = symbol  # Imposta il simbolo del giocatore
 
     def is_empty(self, i, j):
-        # ritorno se la casella a posizione i, j è vuota
-        return self.board[i, j] == 0
+        return self.board[i, j] == 0  # Ritorno se la casella a posizione i, j è vuota
 
     def take_action(self, env):
-        # in loop fino a che non ottengo un comando
         while True:
             try:
                 move = input("inserisci la casella in cui inserire il segno, formato i,j: ")
@@ -176,7 +174,7 @@ class Utente:
                 else:
                     print("Please enter valid move")
             except:
-                print("Please enter valid move")
+                print("Please enter valid move")  # Esegui la mossa dell'utente
 
 def gioca(agent, user, env):
     current_player = None
@@ -187,12 +185,11 @@ def gioca(agent, user, env):
         agent.update_state_history(state)
         env.draw_board()
 
-        # Chiediamo se l'utente vuole salvare il gioco dopo ogni mossa
         save = input("Vuoi salvare il gioco? (s/n): ").strip().lower()
         if save == 's':
             filename = input("Inserisci il nome del file: ").strip()
             env.save_state(filename)
-            print(f"Gioco salvato in {filename}")
+            print(f"Gioco salvato in {filename}")  # Chiede se salvare il gioco
 
     agent.update(env)
 
@@ -201,7 +198,7 @@ def gioca(agent, user, env):
     elif env.winner == agent.symbol:
         print("Agent wins!")
     else:
-        print("It's a draw!")
+        print("It's a draw!")  # Determina il vincitore
 
 def main():
     print("Inizio il gioco")
@@ -217,14 +214,13 @@ def main():
     V = np.zeros(env.max_states)
     agent.setV(V)
 
-    # Chiedi all'utente se vuole caricare uno stato di gioco esistente
     load = input("Vuoi caricare uno stato di gioco esistente? (s/n): ").strip().lower()
     if load == 's':
         filename = input("Inserisci il nome del file: ").strip()
         env.load_state(filename)
-        print(f"Gioco caricato da {filename}")
+        print(f"Gioco caricato da {filename}")  # Chiede se caricare uno stato di gioco esistente
 
     gioca(agent, user, env)
 
 if __name__ == '__main__':
-    main()
+    main()  # Funzione principale per iniziare il gioco
